@@ -18,8 +18,8 @@ const GamePage = () => {
 
     const [hand, setHand] = useState<CardType[]>([]);
     const [players, setPlayers] = useState<Player[]>([]);
-    const [lastPlayerId, setLastPlayerId] = useState<string | null>(null);
     const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
+    const [partyLeaderId, setPartyLeaderId] = useState<string | null>(null);
     const [playedCards, setPlayedCards] = useState<
         { playerId: string; card: CardType }[]
     >([]);
@@ -59,8 +59,17 @@ const GamePage = () => {
             setMessage("Bidding phase: Please submit your bid.");
         });
 
-        gameSocket.on("player_list", (playersList: Player[]) => {
-            setPlayers(playersList);
+        gameSocket.on("player_list", ({ players, partyLeaderId }) => {
+            setPlayers(players);
+            setPartyLeaderId(partyLeaderId);
+        });
+
+        gameSocket.on("party_leader_changed", ({ partyLeaderId }) => {
+            setPartyLeaderId(partyLeaderId);
+        });
+
+        gameSocket.on("start_bidding", () => {
+            setIsBidding(true);
         });
 
         gameSocket.on("bid_submitted", ({ playerId, bid }) => {
@@ -90,7 +99,7 @@ const GamePage = () => {
             "card_played",
             ({ playerId, card }: { playerId: string; card: CardType }) => {
                 setPlayedCards((prev) => [...prev, { playerId, card }]);
-                if (socket && playerId === socket.id) {
+                if (gameSocket && playerId === gameSocket.id) {
                     console.log("true");
 
                     setHand((prev) =>
@@ -100,7 +109,7 @@ const GamePage = () => {
                         )
                     );
                 }
-                console.log(socket?.id);
+                console.log(gameSocket.id);
                 console.log(playerId);
                 console.log(card);
             }
@@ -109,6 +118,12 @@ const GamePage = () => {
         gameSocket.on("invalid_move", (message: string) => {
             alert(message);
         });
+
+        gameSocket.on("invalid_player_count", (message: string) => {
+            alert(message);
+        });
+
+        gameSocket.on("trick_won", (playersList: Player[]) => {});
 
         gameSocket.on(
             "next_trick",
@@ -121,6 +136,7 @@ const GamePage = () => {
         gameSocket.on("round_over", ({ players }) => {
             // Handle round over, show scores, etc.
             setMessage("Round over.");
+            setPlayers(players);
         });
 
         // gameSocket.on("invalid_move", (msg: string) => {
@@ -154,7 +170,16 @@ const GamePage = () => {
         if (socket) {
             socket.emit("submit_bid", { roomId, bid });
         }
+        setBidSubmitted(true);
+        setIsBidding(false);
     };
+
+    function isPartyLeader() {
+        if (!socket) {
+            return false;
+        }
+        return partyLeaderId === socket.id;
+    }
 
     // Function to play a card
     const playCard = (card: CardType) => {
@@ -165,6 +190,21 @@ const GamePage = () => {
 
         if (socket) {
             socket.emit("play_card", { roomId, card });
+        }
+    };
+
+    const startGame = () => {
+        if (socket) {
+            socket.emit("start_game", { roomId }); // Replace with your actual roomId
+        }
+    };
+
+    const transferLeadership = (newLeaderId: string) => {
+        if (socket) {
+            socket.emit("transfer_leadership", {
+                roomId: roomId,
+                newLeaderId,
+            });
         }
     };
 
@@ -179,6 +219,7 @@ const GamePage = () => {
                 players={players}
                 currentPlayerId={currentPlayerId}
                 socket={socket}
+                partyLeaderId={partyLeaderId}
             />
             {hand.length > 0 && (
                 <div>
@@ -220,7 +261,7 @@ const GamePage = () => {
                 </div>
             )}
             {/* Bid submission if in bidding phase */}
-            {message.includes("Bidding phase") && !bidSubmitted && (
+            {isBidding && !bidSubmitted && (
                 <div>
                     <h2 className="font-semibold">Submit your bid:</h2>
                     <div className="flex space-x-2 flex-wrap">
@@ -235,6 +276,14 @@ const GamePage = () => {
                         ))}
                     </div>
                 </div>
+            )}
+            {isPartyLeader() && (
+                <PartyLeaderControls
+                    partyLeaderId={partyLeaderId}
+                    startGame={startGame}
+                    players={players}
+                    transferLeadership={transferLeadership}
+                />
             )}
         </div>
     );

@@ -26,6 +26,11 @@ const PlayerList = ({ players, currentPlayerId, socket }: PlayerListProps) => {
                                 {player.name}{" "}
                                 {player.id === socket?.id && "(you)"}
                             </span>
+                            {player.id === partyLeaderId && (
+                                <span className="ml-2 text-xs text-yellow-500">
+                                    (Leader)
+                                </span>
+                            )}
                             {currentPlayerId === player.id && (
                                 <span className="text-xs text-blue-500">
                                     (Current turn)
