@@ -5,9 +5,10 @@ interface PlayerListProps {
     players: Player[];
     currentPlayerId: string | null;
     socket: Socket | null;
+    partyLeaderId: string | null;
 }
 
-const PlayerList = ({ players, currentPlayerId, socket }: PlayerListProps) => {
+const PlayerList = ({ players, currentPlayerId, socket, partyLeaderId }: PlayerListProps) => {
     return (
         <div>
             <h2 className="font-semibold">Players:</h2>
@@ -18,7 +19,7 @@ const PlayerList = ({ players, currentPlayerId, socket }: PlayerListProps) => {
                         className={`p-2 rounded mb-2 ${
                             currentPlayerId === player.id
                                 ? "bg-blue-100 text-blue-600 font-bold"
-                                : "bg-gray-100 text-gray-800"
+                                : "bg-[var(--card-background)] text-[var(--foreground)]"
                         }`}
                     >
                         <div className="flex justify-between items-center">
@@ -37,9 +38,10 @@ const PlayerList = ({ players, currentPlayerId, socket }: PlayerListProps) => {
                                 </span>
                             )}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">
+                        <div className="text-sm text-[var(--foreground)] mt-1">
                             <div>Bid: {player.bid ?? "N/A"}</div>
                             <div>Tricks Won: {player.tricksWon ?? 0}</div>
+                            <div>Total Score: {player.totalScore ?? 0}</div>
                         </div>
                     </li>
                 ))}
