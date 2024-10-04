@@ -8,6 +8,7 @@ import Card from "../components/Card";
 import { Card as CardType, Player } from "../types";
 import { connectSocket, disconnectSocket } from "../utils/socket";
 import PlayerList from "../components/PlayerList";
+import PartyLeaderControls from "../components/PartyLeaderControls";
 
 const GamePage = () => {
     const searchParams = useSearchParams();
@@ -25,6 +26,7 @@ const GamePage = () => {
     >([]);
     const [message, setMessage] = useState("");
     const [socket, setSocket] = useState<Socket | null>(null);
+    const [isBidding, setIsBidding] = useState(false);
     const [bidSubmitted, setBidSubmitted] = useState(false);
 
     useEffect(() => {}, []);
@@ -123,7 +125,14 @@ const GamePage = () => {
             alert(message);
         });
 
-        gameSocket.on("trick_won", (playersList: Player[]) => {});
+        gameSocket.on("trick_won", ({ winnerId, tricksWon }) => {
+            console.log("Trick won:", winnerId, tricksWon);
+            setPlayers((prevPlayers) =>
+                prevPlayers.map((player) =>
+                    player.id === winnerId ? { ...player, tricksWon } : player
+                )
+            );
+        });
 
         gameSocket.on(
             "next_trick",
