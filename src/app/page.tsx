@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import TestSocket from "./components/TestSoclet";
 
 const HomePage = () => {
     const [playerName, setPlayerName] = useState("");
@@ -14,13 +13,12 @@ const HomePage = () => {
         e.preventDefault();
         if (playerName.trim() && roomId.trim()) {
             router.push(
-                `/game?playerName=${encodeURIComponent(
+                `/lobby?playerName=${encodeURIComponent(
                     playerName
                 )}&roomId=${encodeURIComponent(roomId)}`
             );
         }
     };
-    // return <TestSocket />;
 
     return (
         <div className="flex items-center justify-center h-screen ">
