@@ -1,4 +1,5 @@
 // app/layout.tsx
+import { SocketProvider } from "./context/SocketContext";
 import "./styles/globals.css";
 
 export const metadata = {
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body>{children}</body>
+            <body>
+                <SocketProvider>{children}</SocketProvider>
+            </body>
         </html>
     );
 }
