@@ -19,17 +19,17 @@ const Card: React.FC<CardProps> = ({ suit, value, onClick }) => {
 
     return (
         <div
-            className={`w-16 h-24 bg-white rounded shadow-md flex flex-col justify-between p-1 cursor-pointer ${
+            className={`w-16 h-24 bg-white rounded shadow-md border border-gray-300 flex flex-col justify-between p-2 cursor-pointer transform transition-transform duration-200 ease-in-out hover:-translate-y-3 ${
                 isRed ? "text-red-600" : "text-black"
             }`}
             onClick={onClick}
         >
-            <div className="">
+            <div className="text-sm">
                 {value}
                 {suitSymbols[suit]}
             </div>
             <div className="text-center text-2xl">{suitSymbols[suit]}</div>
-            <div className="transform rotate-180">
+            <div className="text-sm transform rotate-180">
                 {value}
                 {suitSymbols[suit]}
             </div>
