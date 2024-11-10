@@ -40,7 +40,18 @@ const GameInfo: React.FC<GameInfoProps> = ({ staticGameState, gameState }) => {
                                     </span>
                                 )}
                             {/* <span> - Team {player.teamId}</span> */}
-                            <span> - Bid: {gameState.bids[player.id] !== null ? gameState.bids[player.id] : "???"}</span>
+                            <span>
+                                {" "}
+                                - Bid:{" "}
+                                {gameState.bids[player.id] !== null
+                                    ? gameState.bids[player.id]
+                                    : "???"}
+                            </span>
+                            <span>
+                                {" "}
+                                - Tricks Won:{" "}
+                                {gameState.tricksWon[player.id]}
+                            </span>
                         </li>
                     ))}
                 </ul>
@@ -80,16 +91,16 @@ const GameInfo: React.FC<GameInfoProps> = ({ staticGameState, gameState }) => {
             </div> */}
 
             {/* Team Scores */}
-            {/* <div>
+            <div>
                 <h3 className="font-semibold">Team Scores:</h3>
                 <ul className="list-disc list-inside">
-                    {teams.map((team) => (
+                    {Object.entries(staticGameState.teams).map(([teamId, team]) => (
                         <li key={team.teamId}>
-                            Team {team.teamId}: {team.score} points
+                            Team {team.teamId}: {gameState.scores[teamId]} points
                         </li>
                     ))}
                 </ul>
-            </div> */}
+            </div>
         </div>
     );
 };
