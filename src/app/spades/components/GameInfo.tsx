@@ -1,20 +1,16 @@
 import React from "react";
-import { Player } from "@/app/types";
+import {
+    SpadesGameState,
+    SpadesStaticGameState,
+} from "@/app/types/spades";
 
-interface GameInfoProps {
-    // turnOrder: string[];
-    staticGameState: {
-        players: Player[];
-    };
-    gameState: {
-        currentTurnPlayerId: string;
-        phase: string;
-        bids: Record<string, number>;
-        scores: Record<string, number>;
-    };
-}
-
-const GameInfo: React.FC<GameInfoProps> = ({ staticGameState, gameState }) => {
+const GameInfo = ({
+    staticGameState,
+    gameState,
+}: {
+    staticGameState: SpadesStaticGameState;
+    gameState: SpadesGameState;
+}) => {
     return (
         <div className="p-4 bg-[var(--card-background)] text-[var(--foreground)] rounded shadow-md mb-4">
             {/* <h2 className="text-xl font-bold mb-2">Game Information</h2> */}
@@ -42,15 +38,11 @@ const GameInfo: React.FC<GameInfoProps> = ({ staticGameState, gameState }) => {
                             {/* <span> - Team {player.teamId}</span> */}
                             <span>
                                 {" "}
-                                - Bid:{" "}
-                                {gameState.bids[player.id] !== null
-                                    ? gameState.bids[player.id]
-                                    : "???"}
+                                - Bid: {gameState.bids[player.id] ?? "???"}
                             </span>
                             <span>
                                 {" "}
-                                - Tricks Won:{" "}
-                                {gameState.tricksWon[player.id]}
+                                - Tricks Won: {gameState.tricksWon[player.id]}
                             </span>
                         </li>
                     ))}
@@ -94,11 +86,13 @@ const GameInfo: React.FC<GameInfoProps> = ({ staticGameState, gameState }) => {
             <div>
                 <h3 className="font-semibold">Team Scores:</h3>
                 <ul className="list-disc list-inside">
-                    {Object.entries(staticGameState.teams).map(([teamId, team]) => (
-                        <li key={team.teamId}>
-                            Team {team.teamId}: {gameState.scores[teamId]} points
-                        </li>
-                    ))}
+                    {Object.entries(staticGameState.teams).map(
+                        ([teamId, team]) => (
+                            <li key={teamId}>
+                                Team {teamId}: {gameState.scores[teamId]} points
+                            </li>
+                        )
+                    )}
                 </ul>
             </div>
         </div>
