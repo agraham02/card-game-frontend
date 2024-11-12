@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { Socket } from "socket.io-client";
 import { connectSocket, disconnectSocket } from "../utils/socketUtils";
 import { useRouter } from "next/navigation";
@@ -82,8 +82,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         };
     }, [socket]);
 
+    const contextValue = useMemo(
+        () => ({ socket, connect, disconnect }),
+        [socket, connect, disconnect,]
+    );
+
     return (
-        <SocketContext.Provider value={{ socket, connect, disconnect }}>
+        <SocketContext.Provider value={contextValue}>
             {children}
         </SocketContext.Provider>
     );

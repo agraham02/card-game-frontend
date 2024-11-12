@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSocket } from "../context/SocketContext";
 import PartyLeaderControls from "./PartyLeaderControls";
 import { useError } from "../context/ErrorContext";
+import { Player } from "../types/player";
 
 const LobbyPage = () => {
     const router = useRouter();
@@ -102,7 +103,7 @@ const LobbyPage = () => {
                 setRoomState((prevState: any) => ({
                     ...prevState,
                     players: prevState.players.filter(
-                        (player: any) => player.id !== kickedPlayerId
+                        (player: Player) => player.id !== kickedPlayerId
                     ),
                 }));
             }
@@ -131,7 +132,7 @@ const LobbyPage = () => {
             {/* Display players */}
             <h2 className="text-lg font-semibold">Players:</h2>
             <ul>
-                {roomState?.players.map((player: any) => (
+                {roomState?.players.map((player: Player) => (
                     <li key={player.id}>
                         {player.name} {player.id === socket?.id && "(you)"}
                         {player.id === roomState?.partyLeaderId && (

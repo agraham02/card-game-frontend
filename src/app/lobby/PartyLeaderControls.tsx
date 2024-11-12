@@ -1,6 +1,7 @@
 import React, { ChangeEvent, MouseEvent } from "react";
 import { Socket } from "socket.io-client";
 import DropdownInput from "../components/DropdownInput";
+import { Player } from "../types/player";
 
 interface PartyLeaderControlsProps {
     socket: Socket;
@@ -80,7 +81,7 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
                 <ul>
                     {roomState?.turnOrder.map((playerId: string, index: number) => {
                         const player = roomState?.players.find(
-                            (p: any) => p.id === playerId
+                            (p: Player) => p.id === playerId
                         );
                         return (
                             <li
@@ -146,7 +147,7 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
             <div className="mt-4">
                 <h3 className="font-semibold">Manage Players:</h3>
                 <ul>
-                    {roomState?.players.map((player: any) => (
+                    {roomState?.players.map((player: Player) => (
                         <li key={player.id} className="flex items-center my-2">
                             <span className="mr-2">
                                 {player.name}
