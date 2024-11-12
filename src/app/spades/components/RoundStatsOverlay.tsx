@@ -2,8 +2,24 @@
 
 import React from "react";
 
+interface RoundStats {
+    teams: {
+        teamId: string;
+        players: {
+            playerId: string;
+            name: string;
+            bid: number;
+            tricksWon: number;
+        }[];
+        totalBid: number;
+        totalTricksWon: number;
+        roundScore: number;
+        totalScore: number;
+    }[];
+}
+
 interface RoundStatsOverlayProps {
-    roundStats: any;
+    roundStats: RoundStats;
     onClose: () => void;
 }
 
@@ -18,7 +34,7 @@ const RoundStatsOverlay: React.FC<RoundStatsOverlayProps> = ({
                     End of Round Stats
                 </h2>
                 <div className="flex justify-around">
-                    {roundStats.teams.map((team: any) => (
+                    {roundStats.teams.map((team) => (
                         <div key={team.teamId} className="w-1/2 px-4">
                             <h3 className="text-lg font-semibold mb-2">
                                 Team {team.teamId}
@@ -38,7 +54,7 @@ const RoundStatsOverlay: React.FC<RoundStatsOverlayProps> = ({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {team.players.map((player: any) => (
+                                    {team.players.map((player) => (
                                         <tr key={player.playerId}>
                                             <td className="border px-2 py-1">
                                                 {player.name}

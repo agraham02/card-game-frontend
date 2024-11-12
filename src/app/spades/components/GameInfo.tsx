@@ -87,7 +87,7 @@ const GameInfo = ({
                 <h3 className="font-semibold">Team Scores:</h3>
                 <ul className="list-disc list-inside">
                     {Object.entries(staticGameState.teams).map(
-                        ([teamId, team]) => (
+                        ([teamId]) => (
                             <li key={teamId}>
                                 Team {teamId}: {gameState.scores[teamId]} points
                             </li>

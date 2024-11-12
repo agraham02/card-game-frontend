@@ -1,13 +1,14 @@
-import React, { ChangeEvent, MouseEvent } from "react";
+import React, { ChangeEvent } from "react";
 import { Socket } from "socket.io-client";
 import DropdownInput from "../components/DropdownInput";
 import { Player } from "../types/player";
+import { RoomState } from "../types/lobby";
 
 interface PartyLeaderControlsProps {
     socket: Socket;
     roomId: string;
     playerId: string;
-    roomState: any;
+    roomState: RoomState;
 }
 
 const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
@@ -28,7 +29,7 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
         }
     };
 
-    const handleStartGame = (event: MouseEvent<HTMLButtonElement>) => {
+    const handleStartGame = () => {
         if (socket) {
             socket.emit("START_GAME", {
                 roomId,
@@ -73,73 +74,79 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
             <h3>Party Leader Controls</h3>
 
             {/* Game Selection */}
-            <DropdownInput id={"gameType"} handleOnChange={handleGameTypeChange} value={roomState?.gameType || ""}/>
+            <DropdownInput
+                id={"gameType"}
+                handleOnChange={handleGameTypeChange}
+                value={roomState?.gameType || ""}
+            />
 
             {/* Turn Order Controls */}
             <div className="mt-4">
                 <h3 className="font-semibold">Order of Play:</h3>
                 <ul>
-                    {roomState?.turnOrder.map((playerId: string, index: number) => {
-                        const player = roomState?.players.find(
-                            (p: Player) => p.id === playerId
-                        );
-                        return (
-                            <li
-                                key={playerId}
-                                className="flex items-center my-2"
-                            >
-                                <span className="mr-2">
-                                    {index + 1}. {player?.name}
-                                    {player?.id === socket?.id && " (you)"}
-                                </span>
-                                <>
-                                    <button
-                                        disabled={index === 0}
-                                        onClick={() => {
-                                            const newOrder = [
-                                                ...roomState.turnOrder,
-                                            ];
-                                            // Swap the current player with the one above
-                                            [
-                                                newOrder[index - 1],
-                                                newOrder[index],
-                                            ] = [
-                                                newOrder[index],
-                                                newOrder[index - 1],
-                                            ];
-                                            emitTurnOrderChange(newOrder);
-                                        }}
-                                        className="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded"
-                                    >
-                                        ▲
-                                    </button>
-                                    <button
-                                        disabled={
-                                            index ===
-                                            roomState.turnOrder.length - 1
-                                        }
-                                        onClick={() => {
-                                            const newOrder = [
-                                                ...roomState.turnOrder,
-                                            ];
-                                            // Swap the current player with the one below
-                                            [
-                                                newOrder[index],
-                                                newOrder[index + 1],
-                                            ] = [
-                                                newOrder[index + 1],
-                                                newOrder[index],
-                                            ];
-                                            emitTurnOrderChange(newOrder);
-                                        }}
-                                        className="ml-1 px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded"
-                                    >
-                                        ▼
-                                    </button>
-                                </>
-                            </li>
-                        );
-                    })}
+                    {roomState?.turnOrder.map(
+                        (playerId: string, index: number) => {
+                            const player = roomState?.players.find(
+                                (p: Player) => p.id === playerId
+                            );
+                            return (
+                                <li
+                                    key={playerId}
+                                    className="flex items-center my-2"
+                                >
+                                    <span className="mr-2">
+                                        {index + 1}. {player?.name}
+                                        {player?.id === socket?.id && " (you)"}
+                                    </span>
+                                    <>
+                                        <button
+                                            disabled={index === 0}
+                                            onClick={() => {
+                                                const newOrder = [
+                                                    ...roomState.turnOrder,
+                                                ];
+                                                // Swap the current player with the one above
+                                                [
+                                                    newOrder[index - 1],
+                                                    newOrder[index],
+                                                ] = [
+                                                    newOrder[index],
+                                                    newOrder[index - 1],
+                                                ];
+                                                emitTurnOrderChange(newOrder);
+                                            }}
+                                            className="ml-2 px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded"
+                                        >
+                                            ▲
+                                        </button>
+                                        <button
+                                            disabled={
+                                                index ===
+                                                roomState.turnOrder.length - 1
+                                            }
+                                            onClick={() => {
+                                                const newOrder = [
+                                                    ...roomState.turnOrder,
+                                                ];
+                                                // Swap the current player with the one below
+                                                [
+                                                    newOrder[index],
+                                                    newOrder[index + 1],
+                                                ] = [
+                                                    newOrder[index + 1],
+                                                    newOrder[index],
+                                                ];
+                                                emitTurnOrderChange(newOrder);
+                                            }}
+                                            className="ml-1 px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded"
+                                        >
+                                            ▼
+                                        </button>
+                                    </>
+                                </li>
+                            );
+                        }
+                    )}
                 </ul>
             </div>
 

@@ -6,13 +6,22 @@ import { useSocket } from "../context/SocketContext";
 import PartyLeaderControls from "./PartyLeaderControls";
 import { useError } from "../context/ErrorContext";
 import { Player } from "../types/player";
+import { RoomState } from "../types/lobby";
 
 const LobbyPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const playerName = searchParams.get("playerName") ?? "";
     const roomId = searchParams.get("roomId") ?? "";
-    const [roomState, setRoomState] = useState<any>(null);
+    const [roomState, setRoomState] = useState<RoomState>({
+        id: "",
+        players: [],
+        partyLeaderId: "",
+        gameRules: {},
+        turnOrder: [],
+        status: "",
+        gameType: "",
+    });
     const [playerId, setPlayerId] = useState<string | undefined>("");
 
     const { connect, socket } = useSocket();
@@ -75,7 +84,7 @@ const LobbyPage = () => {
 
         socket.on("GAME_TYPE_SET", ({ gameType, gameRules }) => {
             console.log("Game type set:", gameType);
-            setRoomState((prevState: any) => ({
+            setRoomState((prevState: RoomState) => ({
                 ...prevState,
                 gameType,
                 gameRules,
@@ -85,7 +94,7 @@ const LobbyPage = () => {
         // **Handle PARTY_LEADER_CHANGED event**
         socket.on("PARTY_LEADER_CHANGED", ({ newLeaderId }) => {
             console.log("Party leader changed:", newLeaderId);
-            setRoomState((prevState: any) => ({
+            setRoomState((prevState: RoomState) => ({
                 ...prevState,
                 partyLeaderId: newLeaderId,
             }));
@@ -100,7 +109,7 @@ const LobbyPage = () => {
                 router.push("/"); // Redirect to home or another page
             } else {
                 // Remove the kicked player from the roomState
-                setRoomState((prevState: any) => ({
+                setRoomState((prevState: RoomState) => ({
                     ...prevState,
                     players: prevState.players.filter(
                         (player: Player) => player.id !== kickedPlayerId
@@ -154,7 +163,7 @@ const LobbyPage = () => {
                         {roomState?.turnOrder.map(
                             (playerId: string, index: number) => {
                                 const player = roomState?.players.find(
-                                    (p: any) => p.id === playerId
+                                    (p: Player) => p.id === playerId
                                 );
                                 return (
                                     <li key={playerId} className="my-2">
