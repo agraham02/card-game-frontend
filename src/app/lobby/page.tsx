@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSocket } from "../context/SocketContext";
 import PartyLeaderControls from "./PartyLeaderControls";
+import { useError } from "../context/ErrorContext";
 
 const LobbyPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const playerName = searchParams.get("playerName") || "";
-    const roomId = searchParams.get("roomId") || "";
+    const playerName = searchParams.get("playerName") ?? "";
+    const roomId = searchParams.get("roomId") ?? "";
     const [roomState, setRoomState] = useState<any>(null);
     const [playerId, setPlayerId] = useState<string | undefined>("");
 
     const { connect, socket } = useSocket();
+    const { setError } = useError();
 
     useEffect(() => {
         if (!socket) {
@@ -66,8 +68,44 @@ const LobbyPage = () => {
             );
         });
 
-        socket.on("ERROR", (data) => {
-            console.error("Error:", data.message);
+        socket.on("ERROR", (error) => {
+            setError(error);
+        });
+
+        socket.on("GAME_TYPE_SET", ({ gameType, gameRules }) => {
+            console.log("Game type set:", gameType);
+            setRoomState((prevState: any) => ({
+                ...prevState,
+                gameType,
+                gameRules,
+            }));
+        });
+
+        // **Handle PARTY_LEADER_CHANGED event**
+        socket.on("PARTY_LEADER_CHANGED", ({ newLeaderId }) => {
+            console.log("Party leader changed:", newLeaderId);
+            setRoomState((prevState: any) => ({
+                ...prevState,
+                partyLeaderId: newLeaderId,
+            }));
+        });
+
+        // **Handle PLAYER_KICKED event**
+        socket.on("PLAYER_KICKED", ({ playerId: kickedPlayerId }) => {
+            console.log("Player kicked:", kickedPlayerId);
+            if (kickedPlayerId === socket.id) {
+                // If the current player was kicked, redirect them
+                alert("You have been kicked from the room.");
+                router.push("/"); // Redirect to home or another page
+            } else {
+                // Remove the kicked player from the roomState
+                setRoomState((prevState: any) => ({
+                    ...prevState,
+                    players: prevState.players.filter(
+                        (player: any) => player.id !== kickedPlayerId
+                    ),
+                }));
+            }
         });
 
         // Cleanup event listeners on unmount
@@ -78,6 +116,9 @@ const LobbyPage = () => {
             socket.off("ROOM_STATE_UPDATED");
             socket.off("GAME_STARTED");
             socket.off("ERROR");
+            socket.off("GAME_TYPE_SET");
+            socket.off("PARTY_LEADER_CHANGED");
+            socket.off("PLAYER_KICKED");
         };
     }, [socket]);
 
