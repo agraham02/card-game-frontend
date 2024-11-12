@@ -9,7 +9,7 @@ const HomePage = () => {
     const [playerName, setPlayerName] = useState("");
     const [roomId, setRoomId] = useState("");
     const router = useRouter();
-    const { disconnect, socket } = useSocket();
+    const { disconnect } = useSocket();
 
     const handleJoinRoomSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,15 +33,15 @@ const HomePage = () => {
         }
     };
 
-    const handleCreateRoomSubmit = () => {
-        if (playerName.trim()) {
-            router.push(
-                `/lobby?playerName=${encodeURIComponent(
-                    playerName
-                )}&roomId=${encodeURIComponent(roomId)}`
-            );
-        }
-    };
+    // const handleCreateRoomSubmit = () => {
+    //     if (playerName.trim()) {
+    //         router.push(
+    //             `/lobby?playerName=${encodeURIComponent(
+    //                 playerName
+    //             )}&roomId=${encodeURIComponent(roomId)}`
+    //         );
+    //     }
+    // };
 
     useEffect(() => {
         disconnect();

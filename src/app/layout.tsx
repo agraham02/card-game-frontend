@@ -1,5 +1,5 @@
 // app/layout.tsx
-import { SocketProvider } from "./context/SocketContext";
+import { AppProviders } from "./context/AppProviders";
 import "./styles/globals.css";
 
 export const metadata = {
@@ -9,13 +9,13 @@ export const metadata = {
 
 export default function RootLayout({
     children,
-}: {
+}: Readonly<{
     children: React.ReactNode;
-}) {
+}>) {
     return (
         <html lang="en">
             <body>
-                <SocketProvider>{children}</SocketProvider>
+                <AppProviders>{children}</AppProviders>
             </body>
         </html>
     );
