@@ -1,5 +1,6 @@
 import React, { ChangeEvent, MouseEvent } from "react";
 import { Socket } from "socket.io-client";
+import DropdownInput from "../components/DropdownInput";
 
 interface PartyLeaderControlsProps {
     socket: Socket;
@@ -28,7 +29,11 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
 
     const handleStartGame = (event: MouseEvent<HTMLButtonElement>) => {
         if (socket) {
-            socket.emit("START_GAME", { roomId, playerId, gameType: "spades" });
+            socket.emit("START_GAME", {
+                roomId,
+                playerId,
+                gameType: roomState?.gameType,
+            });
         }
     };
 
@@ -42,30 +47,38 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
         }
     };
 
+    const handleKickPlayer = (targetPlayerId: string) => {
+        if (socket) {
+            socket.emit("KICK_PLAYER", {
+                roomId,
+                playerId,
+                targetPlayerId,
+            });
+        }
+    };
+
+    const handlePromoteLeader = (newLeaderId: string) => {
+        if (socket) {
+            socket.emit("PROMOTE_LEADER", {
+                roomId,
+                playerId,
+                newLeaderId,
+            });
+        }
+    };
+
     return (
         <div>
             <h3>Party Leader Controls</h3>
 
             {/* Game Selection */}
-            <div>
-                <label htmlFor="gameType">Select Game:</label>
-                <select
-                    id="gameType"
-                    onChange={handleGameTypeChange}
-                    value={roomState?.gameType || ""}
-                >
-                    <option value="">Select Game</option>
-                    <option value="spades">Spades</option>
-                    <option value="dominoes">Dominoes</option>
-                    {/* Add more games as needed */}
-                </select>
-            </div>
+            <DropdownInput id={"gameType"} handleOnChange={handleGameTypeChange} value={roomState?.gameType || ""}/>
 
             {/* Turn Order Controls */}
             <div className="mt-4">
                 <h3 className="font-semibold">Order of Play:</h3>
                 <ul>
-                    {roomState?.turnOrder.map((playerId, index) => {
+                    {roomState?.turnOrder.map((playerId: string, index: number) => {
                         const player = roomState?.players.find(
                             (p: any) => p.id === playerId
                         );
@@ -126,6 +139,46 @@ const PartyLeaderControls: React.FC<PartyLeaderControlsProps> = ({
                             </li>
                         );
                     })}
+                </ul>
+            </div>
+
+            {/* Player Management */}
+            <div className="mt-4">
+                <h3 className="font-semibold">Manage Players:</h3>
+                <ul>
+                    {roomState?.players.map((player: any) => (
+                        <li key={player.id} className="flex items-center my-2">
+                            <span className="mr-2">
+                                {player.name}
+                                {player.id === socket?.id && " (you)"}
+                                {player.id === roomState?.partyLeaderId && (
+                                    <span className="ml-2 text-xs text-yellow-500">
+                                        (Leader)
+                                    </span>
+                                )}
+                            </span>
+                            {player.id !== playerId && (
+                                <>
+                                    <button
+                                        onClick={() =>
+                                            handlePromoteLeader(player.id)
+                                        }
+                                        className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+                                    >
+                                        Promote to Leader
+                                    </button>
+                                    <button
+                                        onClick={() =>
+                                            handleKickPlayer(player.id)
+                                        }
+                                        className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
+                                    >
+                                        Kick
+                                    </button>
+                                </>
+                            )}
+                        </li>
+                    ))}
                 </ul>
             </div>
 
