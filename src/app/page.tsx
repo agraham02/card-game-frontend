@@ -32,7 +32,7 @@ const HomePage = () => {
         // Perform server health check
         const checkServerHealth = async () => {
             try {
-                const apiUrl = process.env.BACKEND_API_URL ?? "";
+                const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "";
                 console.log(apiUrl);
                 const response = await fetch(apiUrl); // Replace with your server URL
                 if (response.ok) {

@@ -3,13 +3,13 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
-const apiUrl = process.env.BACKEND_API_URL;
 
 export const connectSocket = (
     query: { [key: string]: string },
     namespace: string = "/"
 ) => {
     if (!socket) {
+        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
         console.log("Connecting socket..." + apiUrl);
         socket = io(`${apiUrl}${namespace}`, { query });
         console.log(socket);
