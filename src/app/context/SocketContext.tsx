@@ -28,7 +28,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         namespace: string,
         options: { playerName: string; roomId: string }
     ) => {
-        const gameSocket = connectSocket(namespace, options);
+        const gameSocket = connectSocket(options, namespace);
         setSocket(gameSocket);
 
         gameSocket.on("return_to_lobby", () => {
