@@ -41,6 +41,7 @@ const HomePage = () => {
                     setIsServerHealthy(false);
                 }
             } catch (error) {
+                console.error("Error checking server health:", error);
                 setIsServerHealthy(false);
             }
         };
