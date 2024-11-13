@@ -1,6 +1,4 @@
 "use client";
-// TODO: add loading screen to check the health of the server
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "./context/SocketContext";
@@ -8,44 +6,68 @@ import { useSocket } from "./context/SocketContext";
 const HomePage = () => {
     const [playerName, setPlayerName] = useState("");
     const [roomId, setRoomId] = useState("");
+    const [isServerHealthy, setIsServerHealthy] = useState<boolean | null>(
+        null
+    );
     const router = useRouter();
     const { disconnect } = useSocket();
 
     const handleJoinRoomSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (playerName.trim()) {
-            let randomName = "";
-            if (!roomId.trim()) {
-                randomName = Math.random()
-                    .toString(36)
-                    .substring(2, 8)
-                    .toUpperCase();
-            }
-
+        if (playerName.trim() && isServerHealthy) {
+            const roomIdentifier =
+                roomId.trim() ||
+                Math.random().toString(36).substring(2, 8).toUpperCase();
             router.push(
                 `/lobby?playerName=${encodeURIComponent(
                     playerName
-                )}&roomId=${encodeURIComponent(
-                    roomId.trim() || randomName
-                )}`
+                )}&roomId=${encodeURIComponent(roomIdentifier)}`
             );
         }
     };
 
-    // const handleCreateRoomSubmit = () => {
-    //     if (playerName.trim()) {
-    //         router.push(
-    //             `/lobby?playerName=${encodeURIComponent(
-    //                 playerName
-    //             )}&roomId=${encodeURIComponent(roomId)}`
-    //         );
-    //     }
-    // };
-
     useEffect(() => {
         disconnect();
+
+        // Perform server health check
+        const checkServerHealth = async () => {
+            try {
+                const apiUrl = process.env.BACKEND_API_URL ?? "";
+                console.log(apiUrl);
+                const response = await fetch(apiUrl); // Replace with your server URL
+                if (response.ok) {
+                    setIsServerHealthy(true);
+                } else {
+                    setIsServerHealthy(false);
+                }
+            } catch (error) {
+                setIsServerHealthy(false);
+            }
+        };
+
+        checkServerHealth();
     }, []);
+
+    if (isServerHealthy === null) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                Checking server status...
+            </div>
+        );
+    }
+
+    if (isServerHealthy === false) {
+        return (
+            <div className="flex items-center justify-center h-screen text-center">
+                <div>
+                    <h1 className="text-2xl font-bold mb-4">
+                        Server Unreachable
+                    </h1>
+                    <p>Please check your connection or try again later.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex items-center justify-center h-screen ">
@@ -88,27 +110,12 @@ const HomePage = () => {
                             placeholder="Enter Room ID to Join"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <button
-                            type="submit"
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-                            onClick={handleJoinRoomSubmit}
-                        >
-                            Join Game
-                        </button>
-                        {/* <div className="flex items-center my-4">
-                            <hr className="flex-grow border-t border-gray-300" />
-                            <span className="px-2 ">or</span>
-                            <hr className="flex-grow border-t border-gray-300" />
-                        </div>
-                        <button
-                            type="button"
-                            className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-                            onClick={handleCreateRoomSubmit}
-                        >
-                            Create Room
-                        </button> */}
-                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                    >
+                        Join Game
+                    </button>
                 </form>
             </div>
         </div>

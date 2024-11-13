@@ -10,7 +10,7 @@ export const connectSocket = (
     namespace: string = "/"
 ) => {
     if (!socket) {
-        console.log("Connecting socket...");
+        console.log("Connecting socket..." + apiUrl);
         socket = io(`${apiUrl}${namespace}`, { query });
         console.log(socket);
     } else {
