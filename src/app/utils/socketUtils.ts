@@ -3,13 +3,15 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
+const apiUrl = process.env.BACKEND_API_URL;
+
 export const connectSocket = (
-    namespace: string = "/",
-    query: { [key: string]: string }
+    query: { [key: string]: string },
+    namespace: string = "/"
 ) => {
     if (!socket) {
         console.log("Connecting socket...");
-        socket = io(`http://localhost:5000${namespace}`, { query });
+        socket = io(`${apiUrl}${namespace}`, { query });
         console.log(socket);
     } else {
         console.log("Socket already connected");
